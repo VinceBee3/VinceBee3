@@ -1,0 +1,40 @@
+---
+- name: Building a file from a JSON backup
+  hosts: planetexpress
+  gather_facts: yes
+
+  vars:
+          issastros: "{{ lookup('url', 'http://api.open-notify.org/astros.json', split_lines=false) }}"
+
+  tasks:
+         ### write one or two tasks
+         ### that move the data contained in ISSASTROS
+         ### and place in a file ~/isspassengers.txt
+         ### on each of the remote hosts
+
+         - name: Display issastros
+           debug:
+                   var: issastros
+           
+         - name: Copy content of issastros to local file
+           copy:
+                   content: "{{ issastros }}"
+                   dest: ~/astros.json
+         
+
+           ### WRITE ONLY THE FULL NAMES INTO A FILE        
+         - name: Copy Content
+           lineinfile:
+                   path: ~/astronames.txt
+                   line: "{{ item.name }}"
+                   create: yes
+
+
+           ### WRITE ONLY THE FIRST NAMES INTO A FILE
+         - name: copy just the names to a file on remote hosts
+           lineinfile:
+                   path: ~/astrofirstnames.txt
+                   line: "{{ item.name.split()[0] }}"
+                   create: yes
+           
+           loop: "{{ issastros.people }}"    
